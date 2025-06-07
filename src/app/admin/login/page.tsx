@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "../../../components/ui/button"
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -60,12 +61,12 @@ export default function AdminLogin() {
           className="border p-2 w-full rounded mb-6"
         />
 
-        <button
+        <Button
           type="submit"
           className="bg-blue-600 text-white py-2 rounded w-full hover:bg-blue-700 transition"
         >
           Giriş Yap
-        </button>
+        </Button>
       </form>
     </div>
   );
