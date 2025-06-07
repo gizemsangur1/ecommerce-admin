@@ -15,3 +15,5 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Sunucu hatası", error: error.message }, { status: 500 });
   }
 }
+
+

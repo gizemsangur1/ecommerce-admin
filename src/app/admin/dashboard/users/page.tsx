@@ -1,6 +1,6 @@
-
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 interface User {
@@ -9,6 +9,8 @@ interface User {
   email: string;
   role: string;
 }
+const token = localStorage.getItem("token");
+
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -17,7 +19,7 @@ export default function UsersPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("/api/users"); 
+        const res = await fetch("/api/users");
         const data = await res.json();
         setUsers(data);
       } catch (error) {
@@ -29,7 +31,34 @@ export default function UsersPage() {
 
     fetchUsers();
   }, []);
-  console.log(users)
+
+  const handleDeleteUser = async (id: string) => {
+    if (!confirm("Bu kullanıcıyı silmek istediğinize emin misiniz?")) return;
+
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`, 
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (res.ok) {
+        setUsers(users.filter((user) => user._id !== id));
+        alert("Kullanıcı başarıyla silindi.");
+      } else {
+        const errorData = await res.json();
+        console.error("Silme hatası:", errorData);
+        alert(
+          `Kullanıcı silinemedi: ${errorData.message || "Bilinmeyen hata"}`
+        );
+      }
+    } catch (error) {
+      console.error("Silme işlemi başarısız:", error);
+      alert("Silme işlemi sırasında bir hata oluştu.");
+    }
+  };
 
   if (loading) return <p>Yükleniyor...</p>;
 
@@ -40,9 +69,10 @@ export default function UsersPage() {
         <thead>
           <tr className="bg-gray-100 text-left">
             <th className="p-2 border">ID</th>
-            <th className="p-2 border">İsim</th>
+            <th className="p-2 border">Name</th>
             <th className="p-2 border">Email</th>
-            <th className="p-2 border">Rol</th>
+            <th className="p-2 border">Role</th>
+            <th className="p-2 border">Delete</th>
           </tr>
         </thead>
         <tbody>
@@ -52,6 +82,14 @@ export default function UsersPage() {
               <td className="p-2 border">{user.name}</td>
               <td className="p-2 border">{user.email}</td>
               <td className="p-2 border">{user.role}</td>
+              <td className="p-2 border">
+                <Button
+                  variant="destructive"
+                  onClick={() => handleDeleteUser(user._id)}
+                >
+                  Delete
+                </Button>
+              </td>
             </tr>
           ))}
         </tbody>
